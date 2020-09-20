@@ -20,7 +20,7 @@ function get_today() {
     var mm = today.getMonth() +1;
     mm = (mm < 10) ? `0${mm}` : `${mm}`;
 
-    return `${yyyy}-${mm}`;
+    return `2100-${mm}-01`;
 }
 
 const con = {
@@ -188,7 +188,7 @@ function search_article_metadata(res, user_query, count, author, venue, begin_da
 
     var where_search_field = []
     for (let i in q){
-        where_search_field.push(`( ar.title ILIKE '%${q[i]}%' OR ar.abstract ILIKE '%${q[i]}%' OR ar.keywords ILIKE '%${q[i]}%' )`);
+        where_search_field.push(`(ar.title ILIKE '%${q[i]}%' OR ar.abstract ILIKE '%${q[i]}%' OR ar.keywords ILIKE '%${q[i]}%')`);
     }
     where_search_field = where_search_field.join(' AND ');
     const where_date_field = pg_date_filter(begin_date, end_date);
@@ -271,6 +271,8 @@ function search_article_metadata(res, user_query, count, author, venue, begin_da
         (${where_venue_field})
     `;
 
+    // console.log(select_query);
+
     console.log("Searching...")
     pool.query(select_query, (err, results) => {
         if (err){
@@ -280,7 +282,7 @@ function search_article_metadata(res, user_query, count, author, venue, begin_da
             });
         } else {
             var data = [];
-            // console.log(results.rowCount)
+            console.log("Artigos encontados:", results.rowCount);
             for (var i = 0; i < results.rowCount; i++){
                 var resultadoAtual = results.rows[i].dados;
                 // console.log(results.rows[i]);
@@ -401,11 +403,11 @@ function search_journals(res) {
 }
 
 function pg_date_filter(begin_date, end_date){
-    if (begin_date == '') return '1 = 1';
+    if (begin_date == '' && end_date == '') return '1=1';
     
     var date_clause = [];
-    date_clause.push(`(ar.date_formatted >= '${begin_date}')`);
-    date_clause.push(`(ar.date_formatted <= '${end_date}')`);
+    if (begin_date != '') date_clause.push(`(ar.date_formatted >= '${begin_date}')`);
+    if (end_date   != '') date_clause.push(`(ar.date_formatted <= '${end_date}')`);
 
     return date_clause.join(" AND ");
 }

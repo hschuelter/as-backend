@@ -29,9 +29,9 @@ app.get('/search', (req, res) => {
     count = (count == '' || isNaN(count)) ? 1000 : count;
     author = (author == '') ? '' : author;
     venue = (venue == '') ? '' : venue;
-    begin_date = (begin_date == '') ? '' : begin_date;
+    begin_date = (begin_date == '' || begin_date == '-01') ? '' : begin_date;
 
-    end_date = (end_date == '') ? my_utils.get_today() : end_date;
+    end_date = (end_date == '' || end_date == '-01') ? my_utils.get_today() : end_date;
     if (begin_date > end_date) begin_date = ''
 
     count = parseInt(count);
